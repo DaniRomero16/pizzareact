@@ -5,12 +5,18 @@ import Carrito from "./components/Carrito/Carrito";
 import PizzaMitades from "./components/PizzaMitades/PizzaMitades";
 import PizzaPerso from "./components/PizzaPerso/PizzaPerso";
 import axios from 'axios';
+import { BrowserRouter } from 'react-router-dom';
+import { Route } from 'react-router-dom';
+import Login from "./containers/Login/Login";
+
+const AUTH_TOKEN = sessionStorage.getItem('Authorization');
+axios.defaults.headers.common['Authorization'] = AUTH_TOKEN;
 
 class App extends Component {
   state = {
     pedido: [],
     carrito: false,
-    carta: []
+    carta: [],
   };
   anadirPizza = this.anadirPizza.bind(this);
   enviarPedido = this.enviarPedido.bind(this);
@@ -20,7 +26,7 @@ class App extends Component {
     axios.get('http://localhost:3001/carta')
     .then(response => {
         console.log(response);
-        this.setState({ carta: response.data });
+        this.setState({ carta: response.data.result });
     })
   }
 
@@ -39,12 +45,13 @@ class App extends Component {
 
   render() {
     return (
+      <BrowserRouter>
       <div className="App">
         <nav
           className="navbar navbar-light"
           style={{ backgroundColor: "#e8e9ea" }}
         >
-          <a className="navbar-brand" href="/home">
+          <a className="navbar-brand" href="/">
             <img
               src="https://vignette.wikia.nocookie.net/logosfake/images/4/47/Telepizza_2003.png/revision/latest?cb=20140201173556"
               width="250"
@@ -66,8 +73,9 @@ class App extends Component {
             </button>
           </div>
         </nav>
-
-        <div className="row">
+        <Route path="/" exact component={Login} />
+        <Route path="/hacerpedido" exact render={() =>{
+          return(<div className="row">
           <div className="col-8">
             <div className="container-fluid mt-2">
               <img
@@ -97,8 +105,11 @@ class App extends Component {
           <div className="col-3 mt-5 carro">
             <Carrito mostrar={this.state.carrito} pedido={this.state.pedido} pedir={this.enviarPedido} />
           </div>
-        </div>
+        </div>)
+        }} />
+        
       </div>
+      </BrowserRouter>
     );
   }
 }

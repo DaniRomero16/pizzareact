@@ -1,5 +1,6 @@
 userModel = require('../models/usersModel');
 var bcrypt = require('bcrypt-nodejs');
+var jwt = require('jsonwebtoken');
 
 var controller = {
     registerUser: function (req, res) {
@@ -8,7 +9,7 @@ var controller = {
             bcrypt.hash(password, salt, null, function (err, hash) {
                 password = hash;
                 usuario = new userModel();
-                usuario.nombre = req.body.name;
+                usuario.username = req.body.username;
                 usuario.email = req.body.email;
                 usuario.password = password;
                 usuario.save((err, result) => {
@@ -17,40 +18,41 @@ var controller = {
                         return res.send(err);
                     }
                     else {
-                        req.session.user = {
-                            'user': req.body.name,
-                            'email': req.body.email
-                        };
                         let user = {
                             id: result._id,
-                            nombre: req.body.name,
+                            username: req.body.username,
                             email: req.body.email
                         };
-                        return res.send(user);
+                        jwt.sign({user}, 'telepizza', { expiresIn: '2h' }, (err,token) => {
+                            return res.json({
+                                token
+                            })
+                        })
                     }
                 })
             });
         })
     },
     loginUser: function (req, res) {
-        userModel.findOne({ email: req.body.email }, function (err, result) {
+        userModel.findOne({ username: req.body.username }, function (err, result) {
+            
             if (err) {
                 return res.send(err);
             }
             else {
                 if (result == "") {
-                    return res.send('Email introducido no válido');
+                    return res.send('User introducido no válido');
                 } else {
                     bcrypt.compare(req.body.password, result.password, function (err, iguales) {
                         if (err) {
                             return res.send(err)
                         } else {
                             if (iguales) {
-                                req.session.user = {
-                                    'user': result.nombre,
-                                    'email': result.email
-                                };
-                                return res.send(result);
+                                jwt.sign({user}, 'telepizza', { expiresIn: '2h' }, (err,token) => {
+                                    return res.json({
+                                        token
+                                    })
+                                })
                             } else {
                                 return res.send('La contraseña no es correcta')
                             };
@@ -59,14 +61,9 @@ var controller = {
                 };
             };
         });
-        console.log(req.session);
     },
     logoutUser: function (req, res) {
-        if (req.session.user) {
-            req.session.destroy();
-        } else {
-            return res.send('No existe un login de usuario')
-        }
+        
     }
 };
 
