@@ -5,9 +5,11 @@ var PedidosController = require("./controllers/pedidosController");
 
 app.post("/users/register", UsersController.registerUser);
 app.post("/users/login", UsersController.loginUser);
+app.post("/getuser", verifyToken, UsersController.getUserInfo);
 
 app.get("/carta", verifyToken, PizzasController.getPizzas);
-app.post("/pedido", PedidosController.addPedido);
+app.post("/pedido", verifyToken, PedidosController.addPedido);
+app.post("/getpedidos", verifyToken, UsersController.getPedidos);
 
 //token format
 //authorization: bearer <access_token>
@@ -15,7 +17,6 @@ app.post("/pedido", PedidosController.addPedido);
 // verify token
 
 function verifyToken(req, res, next) {
-  console.log(req.headers);
   //get auth header value
   const bearerHeader = req.headers["authorization"];
   //check if bearer is undefined

@@ -3,6 +3,7 @@ var Schema = mongoose.Schema;
 
 var pedidoSchema = Schema({
     pedido:JSON,
-    total: Number
+    total: Number,
+    user: String
 })
 module.exports = mongoose.model('pedidos', pedidoSchema);

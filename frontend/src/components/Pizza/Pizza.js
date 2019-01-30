@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 
 export class Pizza extends Component {
+  
   render() {
     return (
         <div className="card" style={{width: '21.5rem', backgroundColor: '#e8e9ea'}}>

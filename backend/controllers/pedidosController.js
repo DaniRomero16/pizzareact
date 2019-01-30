@@ -5,6 +5,7 @@ var controller = {
         pedido = new pedidosModel();
         pedido.pedido = req.body.array;
         pedido.total = req.body.total;
+        pedido.user = req.body.user;
         pedido.save((err, result) => {
             if (err) {
                 console.log(err);

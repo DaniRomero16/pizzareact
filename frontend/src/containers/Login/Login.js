@@ -10,6 +10,7 @@ export class Login extends Component {
       username: '',
       username2: '',
       password2: '',
+      logged: false,
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -39,7 +40,11 @@ export class Login extends Component {
     };
     axios.post("http://localhost:3001/users/register", e).then(response => {
       console.log(response);
-      sessionStorage.setItem('Authorization','Bearer '+response.data.token)
+      sessionStorage.setItem('Authorization','Bearer '+response.data.token);
+      if (response.status === 200) {
+        this.props.fun();
+      }
+      
     });
   }
 
@@ -50,17 +55,21 @@ export class Login extends Component {
     };
     axios.post("http://localhost:3001/users/login", e).then(response => {
       console.log(response);
-      sessionStorage.setItem('Authorization','Bearer '+response.data.token)
+      sessionStorage.setItem('Authorization','Bearer '+response.data.token);
+      if (response.status === 200) {
+        this.props.fun();
+      }
     });
   }
   render() {
+    
     return (
+      
       <div className="container-fluid">
         <div className="container">
           <h2 className="text-center" id="title">
             Bienvenido a Telepizza
           </h2>
-
           <div className="row">
             <div className="col-md-5">
               <form >

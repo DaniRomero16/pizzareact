@@ -1,4 +1,5 @@
 userModel = require('../models/usersModel');
+pedidosModel = require('../models/pedidosModel');
 var bcrypt = require('bcrypt-nodejs');
 var jwt = require('jsonwebtoken');
 
@@ -22,7 +23,7 @@ var controller = {
                             id: result._id,
                             username: req.body.username,
                             email: req.body.email
-                        };
+                        }
                         jwt.sign({user}, 'telepizza', { expiresIn: '2h' }, (err,token) => {
                             return res.json({
                                 token
@@ -48,9 +49,14 @@ var controller = {
                             return res.send(err)
                         } else {
                             if (iguales) {
+                                let user = {
+                                    id: result._id,
+                                    username: req.body.username,
+                                    email: req.body.email,
+                                }
                                 jwt.sign({user}, 'telepizza', { expiresIn: '2h' }, (err,token) => {
                                     return res.json({
-                                        token
+                                        token,
                                     })
                                 })
                             } else {
@@ -62,9 +68,26 @@ var controller = {
             };
         });
     },
-    logoutUser: function (req, res) {
-        
-    }
+    getUserInfo: function (req, res) {
+        return res.json({
+            ...jwt.verify(req.token,'telepizza'),
+        })
+    },
+    getPedidos: function (req, res) {
+        pedidosModel.find({ user: req.body.user }, function (err, result) {
+            
+            if (err) {
+                return res.send(err);
+            }
+            else {
+                if (result == "") {
+                    return res.send('Algo fue mal');
+                } else {
+                    return res.send(result);
+                };
+            };
+        });
+    },
 };
 
 module.exports = controller;
